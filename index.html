@@ -22,8 +22,8 @@
        Los tiempos y movimientos están en estilos.css (sección ANIMACIÓN DE ENTRADA).
        El orden importa: lo que se escribe después queda encima, por eso los
        billetes van entre la parte de atrás y el frente de la billetera. -->
-  <div id="intro" aria-hidden="true">
-    <svg viewBox="0 0 512 512" role="presentation">
+  <div id="intro">
+    <svg viewBox="0 0 512 512" aria-hidden="true">
       <defs>
         <!-- Un solo dibujo de billete que se reutiliza con <use> -->
         <g id="billete">
@@ -71,7 +71,18 @@
       </g>
       </g>
     </svg>
-    <p class="intro-nombre">Mis Lukas</p>
+    <p class="intro-nombre" aria-hidden="true">Mis Lukas</p>
+    <!-- Botón para apagar o prender el sonido. El dibujo cambia con la clase "apagado" -->
+    <button id="intro-sonido" type="button" aria-label="Apagar sonido">
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <path d="M3 9v6h4l5 4V5L7 9H3z" fill="currentColor"/>
+        <g class="intro-sonido-ondas" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/>
+          <path d="M18 7a7 7 0 0 1 0 10"/>
+        </g>
+        <path class="intro-sonido-x" d="M16 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
   </div>
   <script>
     // Lluvia de billetes: cada vez que se abre la app caen en posiciones distintas.
@@ -90,16 +101,34 @@
     let audioIntro = null;
     let resultadoSonidoIntro = 'todavía no se sabe'; // lo muestra Ajustes, para diagnosticar
 
+    // Volumen general de la intro: 1 con sonido y 0 en silencio
+    let volumenIntro = null;
+
+    // La elección del usuario se recuerda aparte de sus datos financieros.
+    // Va con try porque en algunos modos el navegador no deja guardar.
+    const CLAVE_SONIDO = 'mis-lukas-sonido';
+    function leerSonidoApagado() {
+      try { return localStorage.getItem(CLAVE_SONIDO) === 'apagado'; } catch { return false; }
+    }
+    function guardarSonidoApagado(apagado) {
+      try {
+        if (apagado) localStorage.setItem(CLAVE_SONIDO, 'apagado');
+        else localStorage.removeItem(CLAVE_SONIDO);
+      } catch { /* si no se puede guardar, solo vale para esta vez */ }
+    }
+    let sonidoIntroApagado = leerSonidoApagado();
+
     // Programa los "frrrrt": muchos golpecitos de ruido, muy cortos y seguidos,
     // uno por cada billete que pasa por la máquina, y el zumbido suave del motor.
     // "duracion" son los segundos que suena la contadora, antes del tin.
-    function programarContadora(ctx, inicio, duracion = 1.6) {
+    // "salida" es por dónde sale el sonido; así el botón puede silenciarlo.
+    function programarContadora(ctx, inicio, duracion = 1.6, salida = ctx.destination) {
       const BILLETES_POR_SEG = 28;  // qué tan rápido cuenta
       const VOLUMEN = 0.8;
 
       const general = ctx.createGain();
       general.gain.value = VOLUMEN;
-      general.connect(ctx.destination);
+      general.connect(salida);
 
       // Un segundo de ruido blanco: de ahí sale el sonido del papel
       const ruido = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
@@ -180,6 +209,9 @@
       const ENTRADA_BILLETES = 0.6; // segundos, cuando la billetera empieza a tragar
 
       audioIntro = new AudioContext();
+      volumenIntro = audioIntro.createGain();
+      volumenIntro.gain.value = sonidoIntroApagado ? 0 : 1;
+      volumenIntro.connect(audioIntro.destination);
       // Si el navegador no permite sonido sin un toque previo, esto se queda
       // esperando y la animación sigue en silencio, sin ningún error.
       audioIntro.resume().then(() => {
@@ -191,11 +223,30 @@
         // la contadora se acorta para que el tin siga cayendo con el salto.
         const retraso = Math.max(0, transcurrido - ENTRADA_BILLETES);
         const duracion = Math.max(0.5, 1.6 - retraso);
-        programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido), duracion);
+        programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido), duracion, volumenIntro);
         resultadoSonidoIntro = `sonó (arrancó a los ${transcurrido.toFixed(1)} s)`;
       }).catch(() => {});
     }
     sonarIntro();
+
+    // Botón del parlante
+    const botonSonido = document.getElementById('intro-sonido');
+    function mostrarEstadoSonido() {
+      botonSonido.classList.toggle('apagado', sonidoIntroApagado);
+      botonSonido.setAttribute('aria-label', sonidoIntroApagado ? 'Encender sonido' : 'Apagar sonido');
+    }
+    mostrarEstadoSonido();
+    botonSonido.addEventListener('click', (evento) => {
+      // Sin esto, el toque también saltaría la animación
+      evento.stopPropagation();
+      sonidoIntroApagado = !sonidoIntroApagado;
+      guardarSonidoApagado(sonidoIntroApagado);
+      mostrarEstadoSonido();
+      if (!volumenIntro) return;
+      volumenIntro.gain.setTargetAtTime(sonidoIntroApagado ? 0 : 1, audioIntro.currentTime, 0.01);
+      // Este toque le da permiso al navegador: si estaba bloqueado, aquí arranca
+      if (!sonidoIntroApagado) audioIntro.resume().catch(() => {});
+    });
   </script>
 
   <div class="app">

@@ -439,7 +439,7 @@ input:not([type=radio]), select {
   cursor: pointer;
   animation: intro-salir .3s ease-in 2.95s forwards;
 }
-#intro svg { width: min(88vw, 400px); height: auto; overflow: visible; }
+#intro > svg { width: min(88vw, 400px); height: auto; overflow: visible; }
 /* El nombre va aparte para que el logo quede justo en el centro de la pantalla */
 .intro-nombre {
   position: absolute;
@@ -452,6 +452,26 @@ input:not([type=radio]), select {
   font-weight: 700;
   animation: intro-aparecer .35s ease-out 2.1s both;
 }
+
+/* Botón para apagar o prender el sonido. env(...) lo aleja de la cámara del celular */
+#intro-sonido {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #1f2937;
+  color: #fde047;
+  cursor: pointer;
+}
+#intro-sonido:focus-visible { outline: 3px solid #1f2937; outline-offset: 2px; }
+.intro-sonido-x { display: none; }
+#intro-sonido.apagado .intro-sonido-ondas { display: none; }
+#intro-sonido.apagado .intro-sonido-x { display: inline; }
 
 /* Arranca del tamaño aproximado del logo del celular y crece */
 .intro-escena {
