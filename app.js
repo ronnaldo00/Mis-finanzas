@@ -94,7 +94,7 @@ function vistaInicio() {
   const bienvenida = estado.movimientos.length > 0 ? '' : `
     <section class="tarjeta vacio">
       <h2>¡Hola! Empieza anotando tu primer ingreso o gasto</h2>
-      <p>Tus datos se quedan guardados en este computador.</p>
+      <p>Tus datos se quedan guardados en este dispositivo.</p>
       <div class="botones">
         <button class="boton boton-principal" data-accion="nuevo-movimiento">+ Agregar movimiento</button>
         <button class="boton" data-accion="cargar-ejemplo">Ver con datos de ejemplo</button>
@@ -526,7 +526,7 @@ function vistaAjustes() {
 
       <section class="tarjeta">
         <h2>Respaldo de tus datos</h2>
-        <p class="ayuda">Tus datos solo están en este navegador. Si borras el historial del navegador o cambias de computador se pierden, así que descarga un respaldo de vez en cuando.</p>
+        <p class="ayuda">Tus datos solo están en este navegador. Si borras el historial del navegador o cambias de dispositivo se pierden, así que descarga un respaldo de vez en cuando.</p>
         <div class="botones">
           <button class="boton" data-accion="exportar">Descargar respaldo</button>
           <button class="boton" data-accion="importar">Restaurar respaldo</button>
