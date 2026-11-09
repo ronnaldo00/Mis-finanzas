@@ -5,7 +5,7 @@
 // =========================================================
 
 // Si cambias la lista de archivos, sube este número (v2, v3...)
-const CACHE = 'mis-lukas-v2';
+const CACHE = 'mis-lukas-v3';
 
 const ARCHIVOS = [
   './',
