@@ -4,45 +4,53 @@
    ========================================================= */
 :root {
   color-scheme: light;
-  --fondo: #f9f9f7;          /* color de atrás de toda la página */
-  --superficie: #fcfcfb;     /* color de las tarjetas */
-  --hover: #f0efec;          /* color al pasar el mouse */
-  --tinta: #0b0b0b;          /* texto principal */
-  --tinta-2: #52514e;        /* texto secundario */
-  --tinta-3: #6f6d68;        /* texto más suave (ejes, ayudas) */
-  --linea: #e1e0d9;          /* líneas finas y bordes */
-  --base-grafica: #c3c2b7;   /* línea base de las gráficas */
-  --acento: #256abf;         /* botones principales */
-  --acento-texto: #ffffff;   /* texto encima del acento */
-  --exito-texto: #006300;    /* montos positivos */
+  --fondo: #fffcf0;          /* color de atrás de toda la página */
+  --superficie: #ffffff;     /* color de las tarjetas */
+  --hover: #fef6cf;          /* color al pasar el mouse */
+  --tinta: #1f2937;          /* texto principal (azul oscuro de los ojos del logo) */
+  --tinta-2: #4b5563;        /* texto secundario */
+  --tinta-3: #6b7280;        /* texto más suave (ejes, ayudas) */
+  --linea: #f0e7c3;          /* líneas finas y bordes */
+  --base-grafica: #cfc49a;   /* línea base de las gráficas */
+  --acento: #fde047;         /* botones principales (amarillo del logo) */
+  --acento-borde: #eab308;   /* borde del acento, para que resalte sobre el fondo claro */
+  --acento-hover: #facc15;   /* acento al pasar el mouse */
+  --acento-texto: #1f2937;   /* texto encima del acento (sobre amarillo, nunca blanco) */
+  --foco: #1f2937;           /* contorno al navegar con teclado */
+  --neutro: #1f2937;         /* medidor sin estado, como lo pagado de una deuda */
+  --exito-texto: #166534;    /* montos positivos (verde del billete) */
 
-  /* Colores de las gráficas */
-  --serie-ingresos: #2a78d6;
-  --serie-gastos: #eb6834;
+  /* Colores de las gráficas. Están probados para que también los distinga
+     una persona daltónica: si los cambias, vuelve a comprobarlo. */
+  --serie-ingresos: #166534;
+  --serie-gastos: #f25c5c;
 
   /* Colores de estado del presupuesto (siempre van con icono y texto) */
-  --bien: #0ca30c;
-  --alerta: #fab219;
-  --critico: #d03b3b;
+  --bien: #15803d;
+  --alerta: #f59e0b;
+  --critico: #b91c1c;
 }
 
 /* Modo oscuro: se activa solo si tu sistema está en modo oscuro */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --fondo: #0d0d0d;
-    --superficie: #1a1a19;
-    --hover: #2c2c2a;
-    --tinta: #f0efec;
-    --tinta-2: #c3c2b7;
-    --tinta-3: #a3a29a;
-    --linea: #2c2c2a;
-    --base-grafica: #383835;
-    --acento: #5598e7;
-    --acento-texto: #0b0b0b;
-    --exito-texto: #2fc42f;
-    --serie-ingresos: #3987e5;
-    --serie-gastos: #d95926;
+    --fondo: #14110a;
+    --superficie: #211d12;
+    --hover: #352e1a;
+    --tinta: #f8f3df;
+    --tinta-2: #d1cab3;
+    --tinta-3: #aaa38c;
+    --linea: #3a3320;
+    --base-grafica: #544b2e;
+    --acento-borde: #fde047;
+    --foco: #fde047;
+    --neutro: #fde047;
+    --exito-texto: #5fd38d;
+    --serie-ingresos: #1fb056;
+    --serie-gastos: #cf2424;
+    --bien: #22a55a;
+    --critico: #dc2626;
   }
 }
 
@@ -69,7 +77,7 @@ p { margin: 0; }
 button, input, select { font: inherit; color: inherit; }
 
 /* Contorno visible al navegar con teclado */
-:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--foco); outline-offset: 2px; }
 
 /* Solo los números que van en columnas usan cifras del mismo ancho */
 .num { font-variant-numeric: tabular-nums; }
@@ -107,7 +115,7 @@ button, input, select { font: inherit; color: inherit; }
   cursor: pointer;
 }
 .menu-item:hover { background: var(--hover); }
-.menu-item.activo { background: var(--hover); color: var(--tinta); font-weight: 600; }
+.menu-item.activo { background: var(--acento); color: var(--acento-texto); font-weight: 600; }
 
 .principal {
   width: 100%;
@@ -142,11 +150,11 @@ button, input, select { font: inherit; color: inherit; }
 .boton:hover { background: var(--hover); }
 .boton-principal {
   background: var(--acento);
-  border-color: var(--acento);
+  border-color: var(--acento-borde);
   color: var(--acento-texto);
   font-weight: 600;
 }
-.boton-principal:hover { background: var(--acento); filter: brightness(1.1); }
+.boton-principal:hover { background: var(--acento-hover); }
 .boton-peligro { color: var(--critico); }
 @media (prefers-color-scheme: dark) { .boton-peligro { color: #f08a8a; } }
 
@@ -281,7 +289,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .estado-bien { --color-estado: var(--bien); }
 .estado-alerta { --color-estado: var(--alerta); }
 .estado-critico { --color-estado: var(--critico); }
-.estado-neutro { --color-estado: var(--acento); }
+.estado-neutro { --color-estado: var(--neutro); }
 
 /* Deudas */
 .deuda-nombre { overflow-wrap: anywhere; }
@@ -384,7 +392,7 @@ input:not([type=radio]), select {
 .segmentos label { position: relative; text-align: center; padding: 7px 2px; border-radius: 7px; cursor: pointer; font-size: .875rem; }
 .segmentos input { position: absolute; opacity: 0; }
 .segmentos label:has(input:checked) { background: var(--superficie); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
-.segmentos label:has(input:focus-visible) { outline: 2px solid var(--acento); }
+.segmentos label:has(input:focus-visible) { outline: 2px solid var(--foco); }
 
 .error { margin-bottom: 10px; color: var(--critico); font-size: .9rem; font-weight: 500; }
 .error:empty { display: none; }
