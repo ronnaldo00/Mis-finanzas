@@ -139,8 +139,13 @@ function vistaInicio() {
         </section>
 
         <section class="tarjeta">
-          <h2>¿En qué se fue la plata?</h2>
-          <p class="ayuda">Gastos por categoría de ${esc(nombreMes(ui.mes).toLowerCase())}</p>
+          <div class="encabezado-seccion">
+            <div>
+              <h2>¿En qué se fue la plata?</h2>
+              <p class="ayuda">Gastos por categoría de ${esc(nombreMes(ui.mes).toLowerCase())}</p>
+            </div>
+            <button class="boton" data-accion="nueva-categoria-gasto">+ Nueva categoría</button>
+          </div>
           <div id="grafica-categorias"></div>
           ${tablaCategorias()}
         </section>
@@ -757,20 +762,52 @@ function guardarPresupuesto(form, datos) {
   return null;
 }
 
+// Agrega la categoría a la lista. Devuelve un mensaje si no se pudo, o null si quedó bien.
+function crearCategoria(nombre, tipo) {
+  const repetida = categoriasDe(tipo).some((c) => c.nombre.toLowerCase() === nombre.toLowerCase());
+  if (repetida) return 'Ya existe una categoría con ese nombre.';
+
+  estado.categorias.push({ id: crearId(), nombre, tipo });
+  return null;
+}
+
 // Agrega una categoría desde el formulario de la pantalla Ajustes
 function guardarCategoria(form, datos) {
   const nombre = datos.get('nombre').trim();
-  const tipo = datos.get('tipo');
   if (!nombre) return null;
 
-  const repetida = categoriasDe(tipo).some((c) => c.nombre.toLowerCase() === nombre.toLowerCase());
-  if (repetida) {
-    avisar('Ya existe una categoría con ese nombre.');
-    return null;
-  }
+  const error = crearCategoria(nombre, datos.get('tipo'));
+  if (error) avisar(error);
+  else guardarYDibujar('Categoría agregada');
+  return null;
+}
 
-  estado.categorias.push({ id: crearId(), nombre, tipo });
-  guardarYDibujar('Categoría agregada');
+// Ventana para crear una categoría de gasto desde "¿En qué se fue la plata?"
+function formularioCategoriaGasto() {
+  abrirDialogo(`
+    <form data-form="categoria-gasto">
+      <h2>Nueva categoría de gasto</h2>
+      <label class="campo">Nombre
+        <input name="nombre" maxlength="40" autocomplete="off" required autofocus placeholder="Ej: Gasolina">
+        <small>Aparecerá en la gráfica cuando anotes un gasto con ella.</small>
+      </label>
+      <p class="error" role="alert"></p>
+      <div class="dialogo-botones">
+        <button type="button" class="boton" data-accion="cerrar-dialogo">Cancelar</button>
+        <button type="submit" class="boton boton-principal">Crear</button>
+      </div>
+    </form>`);
+}
+
+function guardarCategoriaGasto(form, datos) {
+  const nombre = datos.get('nombre').trim();
+  if (!nombre) return 'Escribe un nombre para la categoría.';
+
+  const error = crearCategoria(nombre, 'gasto');
+  if (error) return error;
+
+  dialogo.close();
+  guardarYDibujar(`"${nombre}" creada. Ya la puedes escoger al agregar un gasto.`);
   return null;
 }
 
@@ -899,6 +936,7 @@ const GUARDAR_FORMULARIO = {
   cuenta: guardarCuenta,
   presupuesto: guardarPresupuesto,
   categoria: guardarCategoria,
+  'categoria-gasto': guardarCategoriaGasto,
 };
 
 // ---------------------------------------------------------
@@ -982,6 +1020,7 @@ const ACCIONES = {
     guardarYDibujar('Deuda borrada');
   },
 
+  'nueva-categoria-gasto': () => formularioCategoriaGasto(),
   'borrar-categoria': (id) => {
     const categoria = buscarCategoria(id);
     if (categoriasDe(categoria.tipo).length === 1) {
