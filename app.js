@@ -614,7 +614,7 @@ function formularioMovimiento(movimiento) {
         <input name="monto" class="campo-dinero" inputmode="numeric" autocomplete="off" required
                placeholder="0" value="${dineroEnCampo(m.monto)}">
       </label>
-      <label class="campo"><span id="texto-cuenta">Cuenta</span>
+      <label class="campo"><span id="texto-cuenta">Método de pago</span>
         <select name="cuentaId">${opciones(estado.cuentas, m.cuentaId)}</select>
       </label>
       <label class="campo" id="campo-destino">Hacia la cuenta
@@ -646,7 +646,7 @@ function ajustarFormularioMovimiento() {
 
   dialogo.querySelector('#campo-destino').hidden = esTransferencia === false;
   dialogo.querySelector('#campo-categoria').hidden = esTransferencia;
-  dialogo.querySelector('#texto-cuenta').textContent = esTransferencia ? 'Desde la cuenta' : 'Cuenta';
+  dialogo.querySelector('#texto-cuenta').textContent = esTransferencia ? 'Desde la cuenta' : 'Método de pago';
 
   if (!esTransferencia) {
     const lista = form.elements.categoriaId;
@@ -1050,7 +1050,7 @@ const ACCIONES = {
     const contexto = new AudioContext();
     contexto.resume().then(() => {
       programarContadora(contexto, contexto.currentTime + 0.05);
-      setTimeout(() => contexto.close(), 2000);
+      setTimeout(() => contexto.close(), 3000);
     });
   },
 

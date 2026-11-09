@@ -140,6 +140,21 @@
       motor.connect(volumenMotor).connect(general);
       motor.start(inicio);
       motor.stop(inicio + DURACION);
+
+      // El "¡tin!" final: tres tonos agudos a la vez que se apagan poco a poco
+      const momentoTin = inicio + DURACION + 0.03;
+      for (const [frecuencia, fuerza] of [[2093, 0.45], [3136, 0.25], [5274, 0.1]]) {
+        const tono = ctx.createOscillator();
+        tono.type = 'sine';
+        tono.frequency.value = frecuencia;
+        const volumenTono = ctx.createGain();
+        volumenTono.gain.setValueAtTime(0.0001, momentoTin);
+        volumenTono.gain.exponentialRampToValueAtTime(fuerza, momentoTin + 0.004);
+        volumenTono.gain.exponentialRampToValueAtTime(0.0001, momentoTin + 1);
+        tono.connect(volumenTono).connect(general);
+        tono.start(momentoTin);
+        tono.stop(momentoTin + 1.02);
+      }
     }
 
     // Apaga el sonido cuando la animación termina o se salta

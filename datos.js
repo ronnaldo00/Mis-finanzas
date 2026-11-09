@@ -16,6 +16,14 @@ const TIPOS_CUENTA = {
   credito: 'Tarjeta de crédito',
 };
 
+// Métodos de pago que trae la app, además de Efectivo. Se manejan como cuentas:
+// así salen en la lista al agregar un movimiento y cada uno lleva su saldo.
+const METODOS_PAGO = [
+  { id: 'transferencia', nombre: 'Transferencia', tipo: 'banco', saldoInicial: 0 },
+  { id: 'nequi', nombre: 'Nequi', tipo: 'billetera', saldoInicial: 0 },
+  { id: 'lulo-bank', nombre: 'Lulo Bank', tipo: 'banco', saldoInicial: 0 },
+];
+
 // ---------------------------------------------------------
 // Fechas
 // Las fechas se guardan como texto: '2026-11-08'.
@@ -108,7 +116,11 @@ function estadoInicial() {
   }));
 
   return {
-    cuentas: [{ id: 'efectivo', nombre: 'Efectivo', tipo: 'efectivo', saldoInicial: 0 }],
+    cuentas: [
+      { id: 'efectivo', nombre: 'Efectivo', tipo: 'efectivo', saldoInicial: 0 },
+      ...METODOS_PAGO.map((metodo) => ({ ...metodo })),
+    ],
+    metodosPagoAgregados: true,
     categorias: [
       ...categorias('gasto', ['Mercado y comida', 'Arriendo', 'Servicios', 'Transporte', 'Salud',
         'Educación', 'Ropa', 'Diversión', 'Deudas', 'Otros gastos']),
@@ -142,6 +154,16 @@ function normalizarDatos(datos) {
     return { id: c.id, nombre: c.nombre, tipo, saldoInicial: c.saldoInicial };
   });
   if (cuentas.length === 0) fallar('El respaldo no tiene ninguna cuenta.');
+
+  // A quien ya usaba la app se le agregan los métodos de pago una sola vez,
+  // sin repetir los que ya creó. La marca evita que reaparezca uno que borre.
+  if (datos.metodosPagoAgregados !== true && datos.esEjemplo !== true) {
+    for (const metodo of METODOS_PAGO) {
+      const yaExiste = cuentas.some((c) => c.id === metodo.id
+        || c.nombre.trim().toLowerCase() === metodo.nombre.toLowerCase());
+      if (!yaExiste) cuentas.push({ ...metodo });
+    }
+  }
 
   const categorias = datos.categorias.map((c) => {
     if (!esTexto(c?.id) || !esTexto(c.nombre) || !['gasto', 'ingreso'].includes(c.tipo)) {
@@ -200,7 +222,15 @@ function normalizarDatos(datos) {
       .filter(([id, monto]) => existeCategoria(id, 'gasto') && Number.isSafeInteger(monto) && monto > 0),
   );
 
-  return { cuentas, categorias, movimientos, presupuestos, deudas, esEjemplo: datos.esEjemplo === true };
+  return {
+    cuentas,
+    categorias,
+    movimientos,
+    presupuestos,
+    deudas,
+    esEjemplo: datos.esEjemplo === true,
+    metodosPagoAgregados: true,
+  };
 }
 
 // ---------------------------------------------------------
