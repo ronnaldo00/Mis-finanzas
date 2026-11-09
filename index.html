@@ -92,8 +92,8 @@
 
     // Programa los "frrrrt": muchos golpecitos de ruido, muy cortos y seguidos,
     // uno por cada billete que pasa por la máquina, y el zumbido suave del motor.
-    function programarContadora(ctx, inicio) {
-      const DURACION = 1.6;         // segundos que suena
+    // "duracion" son los segundos que suena la contadora, antes del tin.
+    function programarContadora(ctx, inicio, duracion = 1.6) {
       const BILLETES_POR_SEG = 28;  // qué tan rápido cuenta
       const VOLUMEN = 0.8;
 
@@ -113,7 +113,7 @@
       filtro.Q.value = 0.9;
       filtro.connect(general);
 
-      const total = Math.floor(DURACION * BILLETES_POR_SEG);
+      const total = Math.floor(duracion * BILLETES_POR_SEG);
       for (let i = 0; i < total; i++) {
         // Una pequeña variación en cada golpe para que no suene a robot
         const t = inicio + i / BILLETES_POR_SEG + Math.random() * 0.006;
@@ -135,14 +135,14 @@
       const volumenMotor = ctx.createGain();
       volumenMotor.gain.setValueAtTime(0.0001, inicio);
       volumenMotor.gain.linearRampToValueAtTime(0.14, inicio + 0.08);
-      volumenMotor.gain.setValueAtTime(0.14, inicio + DURACION - 0.08);
-      volumenMotor.gain.linearRampToValueAtTime(0.0001, inicio + DURACION);
+      volumenMotor.gain.setValueAtTime(0.14, inicio + duracion - 0.08);
+      volumenMotor.gain.linearRampToValueAtTime(0.0001, inicio + duracion);
       motor.connect(volumenMotor).connect(general);
       motor.start(inicio);
-      motor.stop(inicio + DURACION);
+      motor.stop(inicio + duracion);
 
       // El "¡tin!" final: tres tonos agudos a la vez que se apagan poco a poco
-      const momentoTin = inicio + DURACION + 0.03;
+      const momentoTin = inicio + duracion + 0.03;
       for (const [frecuencia, fuerza] of [[2093, 0.45], [3136, 0.25], [5274, 0.1]]) {
         const tono = ctx.createOscillator();
         tono.type = 'sine';
@@ -184,9 +184,14 @@
       // esperando y la animación sigue en silencio, sin ningún error.
       audioIntro.resume().then(() => {
         // Si la animación ya se quitó, no hay nada que sonar
-        if (!audioIntro) return;
+        if (!audioIntro || !document.getElementById('intro')) return;
         const transcurrido = (performance.now() - comienzo) / 1000;
-        programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido));
+
+        // En algunos celulares el audio tarda en arrancar. Si llega tarde,
+        // la contadora se acorta para que el tin siga cayendo con el salto.
+        const retraso = Math.max(0, transcurrido - ENTRADA_BILLETES);
+        const duracion = Math.max(0.5, 1.6 - retraso);
+        programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido), duracion);
         resultadoSonidoIntro = `sonó (arrancó a los ${transcurrido.toFixed(1)} s)`;
       }).catch(() => {});
     }

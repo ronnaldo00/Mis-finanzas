@@ -1150,13 +1150,15 @@ navigator.storage?.persist?.();
 
 // Animación de entrada: un toque la salta, y al terminar se quita de la página
 const intro = document.getElementById('intro');
-function quitarIntro() {
+intro.addEventListener('click', () => {
   detenerSonidoIntro();
   intro.remove();
-}
-intro.addEventListener('click', quitarIntro);
+});
 intro.addEventListener('animationend', (evento) => {
-  if (evento.animationName === 'intro-salir') quitarIntro();
+  if (evento.animationName !== 'intro-salir') return;
+  intro.remove();
+  // El audio se apaga un poco después para que el tin no quede cortado
+  setTimeout(detenerSonidoIntro, 1500);
 });
 
 // ¡Arranca la app!
