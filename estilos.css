@@ -420,6 +420,9 @@ input:not([type=radio]), select {
 
 /* =========================================================
    ANIMACIÓN DE ENTRADA
+   El primer logo quieto lo dibuja el celular antes de que arranque
+   la app y no se puede animar. Por eso esto empieza idéntico a ese
+   logo (mismo fondo, centro y pose) y sigue desde ahí.
    Usa los colores fijos del logo, también en modo oscuro.
    La salida también va aquí: si el JavaScript fallara,
    la animación desaparece igual y no tapa la app.
@@ -434,14 +437,33 @@ input:not([type=radio]), select {
   background: #fde047;
   overflow: hidden;
   cursor: pointer;
-  animation: intro-salir .3s ease-in 2.6s forwards;
+  animation: intro-salir .3s ease-in 2.95s forwards;
 }
 #intro svg { width: min(88vw, 400px); height: auto; overflow: visible; }
+/* El nombre va aparte para que el logo quede justo en el centro de la pantalla */
 .intro-nombre {
+  position: absolute;
+  top: calc(50% + min(36vw, 165px));
+  left: 0;
+  right: 0;
+  text-align: center;
   color: #1f2937;
   font-size: 1.6rem;
   font-weight: 700;
-  animation: intro-aparecer .35s ease-out 1.7s both;
+  animation: intro-aparecer .35s ease-out 2.1s both;
+}
+
+/* Arranca del tamaño aproximado del logo del celular y crece */
+.intro-escena {
+  transform-origin: 256px 256px;
+  animation: intro-acercar .3s ease-out both;
+}
+
+/* Los billetes del logo se meten en la billetera */
+.intro-billete-logo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intro-entrar .4s ease-in .25s both;
 }
 
 /* Cada billete cae desde arriba y se mete en la billetera */
@@ -461,20 +483,26 @@ input:not([type=radio]), select {
 .intro-billetera {
   transform-origin: 256px 407px;
   animation:
-    intro-tragar .24s ease-in-out .55s 6,
-    intro-saltar .55s ease-out 1.95s;
+    intro-tragar .24s ease-in-out .65s 6,
+    intro-saltar .55s ease-out 2.25s;
 }
 
-/* Primero boca de asombro; después, la sonrisa grande */
-.intro-boca-o { animation: intro-quitar .15s linear 1.3s forwards; }
+/* Empieza sonriendo como el logo, se asombra con la plata y vuelve a sonreír */
+.intro-boca-o {
+  opacity: 0;
+  animation:
+    intro-aparecer .1s linear .3s forwards,
+    intro-quitar .15s linear 1.6s forwards;
+}
 .intro-sonrisa {
   transform-origin: 256px 342px;
-  animation: intro-sonreir .4s cubic-bezier(.3, 1.6, .5, 1) 1.3s both;
+  animation:
+    intro-quitar-sonrisa .12s linear .3s forwards,
+    intro-sonreir .4s cubic-bezier(.3, 1.6, .5, 1) 1.6s forwards;
 }
-.intro-mejillas { animation: intro-aparecer .3s ease-out 1.35s both; }
 .intro-ojos {
   transform-origin: 256px 302px;
-  animation: intro-parpadear .2s ease-in-out 2.3s;
+  animation: intro-parpadear .2s ease-in-out 2.65s;
 }
 
 @keyframes intro-caer {
@@ -487,6 +515,16 @@ input:not([type=radio]), select {
   from { transform: translateY(-130vh) rotate(12deg); }
   to   { transform: translateY(var(--fin-y)) rotate(var(--giro-fin)); }
 }
+@keyframes intro-acercar {
+  from { transform: scale(.7); }
+  to   { transform: scale(1); }
+}
+@keyframes intro-entrar {
+  from { transform: translateY(var(--fin-y)) rotate(var(--giro-fin)); opacity: 1; }
+  99%  { opacity: 1; }
+  to   { transform: translateY(185px) rotate(0deg) scale(.65); opacity: 0; }
+}
+@keyframes intro-quitar-sonrisa { to { transform: scale(0); } }
 @keyframes intro-tragar {
   50% { transform: scale(1.06, .93); }
 }

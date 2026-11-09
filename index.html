@@ -36,12 +36,18 @@
         </g>
       </defs>
 
+      <g class="intro-escena">
       <!-- Parte de atrás de la billetera -->
       <g class="intro-billetera"><rect x="122" y="215" width="268" height="190" rx="44" fill="#991b1b"/></g>
 
+      <!-- Los billetes del logo: arranca igual a la pantalla inicial del celular
+           y ella se los traga para que parezca que el logo cobra vida -->
+      <g class="intro-billete-logo" style="--giro-fin:-3deg;--fin-y:12px"><use href="#billete"/></g>
+      <g class="intro-billete-logo" style="--giro-fin:-9deg;--fin-y:0px"><use href="#billete"/></g>
+
       <!-- Los dos últimos se quedan asomados, igual que en el logo -->
-      <g id="intro-primer-final" class="intro-billete-final" style="--giro-fin:-3deg;--fin-y:12px;--retraso:1.20s"><use href="#billete"/></g>
-      <g class="intro-billete-final" style="--giro-fin:-9deg;--fin-y:0px;--retraso:1.34s"><use href="#billete"/></g>
+      <g id="intro-primer-final" class="intro-billete-final" style="--giro-fin:-3deg;--fin-y:12px;--retraso:1.55s"><use href="#billete"/></g>
+      <g class="intro-billete-final" style="--giro-fin:-9deg;--fin-y:0px;--retraso:1.68s"><use href="#billete"/></g>
 
       <!-- Frente de la billetera con su cara -->
       <g class="intro-billetera">
@@ -63,6 +69,7 @@
           <path d="M240 359Q256 368 272 359" fill="none" stroke="#f472b6" stroke-width="6" stroke-linecap="round"/>
         </g>
       </g>
+      </g>
     </svg>
     <p class="intro-nombre">Mis Lukas</p>
   </div>
@@ -74,7 +81,7 @@
     for (let i = 0; i < CANTIDAD_BILLETES; i++) {
       const x = Math.round(Math.random() * 440 - 220);     // desde dónde cae
       const giro = Math.round(Math.random() * 120 - 60);   // qué tan torcido viene
-      const retraso = (0.05 + i * 0.038).toFixed(2);       // uno detrás de otro
+      const retraso = (0.4 + i * 0.03).toFixed(2);       // uno detrás de otro
       primerFinal.insertAdjacentHTML('beforebegin',
         `<g class="intro-billete" style="--x:${x}px;--giro:${giro}deg;--retraso:${retraso}s"><use href="#billete"/></g>`);
     }
