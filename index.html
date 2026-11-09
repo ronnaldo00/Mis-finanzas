@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+  <meta charset="utf-8">
+  <!-- Esta línea hace que la página se adapte bien al celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mis Finanzas</title>
+  <link rel="stylesheet" href="estilos.css">
+
+  <!-- Estos datos permiten instalar la página como una app en el celular -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icono-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mis Finanzas">
+  <meta name="theme-color" content="#256abf">
+</head>
+<body>
+  <div class="app">
+    <!-- MENÚ: a la izquierda en computador, abajo en celular.
+         El atributo data-vista dice qué pantalla abre cada botón (lo lee app.js). -->
+    <nav class="menu" aria-label="Secciones">
+      <p class="marca">Mis Finanzas</p>
+      <button class="menu-item" data-vista="inicio">Inicio</button>
+      <button class="menu-item" data-vista="movimientos">Movimientos</button>
+      <button class="menu-item" data-vista="presupuestos">Presupuesto</button>
+      <button class="menu-item" data-vista="deudas">Deudas</button>
+      <button class="menu-item" data-vista="cuentas">Cuentas</button>
+      <!-- En el celular no cabe la palabra, entonces se muestra solo el engranaje -->
+      <button class="menu-item" data-vista="ajustes" aria-label="Ajustes">
+        <span class="texto-largo">Ajustes</span><span class="icono-corto" aria-hidden="true">⚙&#xFE0E;</span>
+      </button>
+    </nav>
+
+    <main class="principal">
+      <!-- BARRA SUPERIOR: título de la pantalla, selector de mes y botón Agregar -->
+      <header class="barra">
+        <h1 id="titulo-vista"></h1>
+        <div class="barra-acciones">
+          <div class="selector-mes" id="selector-mes">
+            <button class="boton-icono" data-accion="mes-anterior" aria-label="Mes anterior">‹</button>
+            <span id="nombre-mes" aria-live="polite"></span>
+            <button class="boton-icono" data-accion="mes-siguiente" aria-label="Mes siguiente">›</button>
+          </div>
+          <button class="boton boton-principal" data-accion="nuevo-movimiento">+ Agregar</button>
+        </div>
+      </header>
+
+      <!-- Aquí aparece el aviso cuando se están viendo datos de ejemplo -->
+      <div id="banner-ejemplo"></div>
+
+      <!-- app.js dibuja aquí la pantalla que esté activa -->
+      <div id="contenido"></div>
+    </main>
+  </div>
+
+  <!-- Ventana emergente reutilizable para todos los formularios -->
+  <dialog id="dialogo"></dialog>
+
+  <!-- Cuadrito que aparece al pasar el mouse por una gráfica -->
+  <div id="tooltip" hidden></div>
+
+  <!-- Mensaje corto que confirma cada acción ("Movimiento guardado") -->
+  <div id="aviso" role="status" aria-live="polite"></div>
+
+  <!-- Selector de archivo oculto, se usa para restaurar un respaldo -->
+  <input type="file" id="archivo-respaldo" accept=".json,application/json" hidden>
+
+  <!-- El orden importa: cada archivo usa cosas definidas en los anteriores -->
+  <script src="datos.js"></script>
+  <script src="graficas.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

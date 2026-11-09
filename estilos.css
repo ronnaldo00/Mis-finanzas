@@ -1,0 +1,464 @@
+/* =========================================================
+   VARIABLES DE COLOR
+   Si quieres cambiar los colores de la app, cámbialos aquí.
+   ========================================================= */
+:root {
+  color-scheme: light;
+  --fondo: #f9f9f7;          /* color de atrás de toda la página */
+  --superficie: #fcfcfb;     /* color de las tarjetas */
+  --hover: #f0efec;          /* color al pasar el mouse */
+  --tinta: #0b0b0b;          /* texto principal */
+  --tinta-2: #52514e;        /* texto secundario */
+  --tinta-3: #6f6d68;        /* texto más suave (ejes, ayudas) */
+  --linea: #e1e0d9;          /* líneas finas y bordes */
+  --base-grafica: #c3c2b7;   /* línea base de las gráficas */
+  --acento: #256abf;         /* botones principales */
+  --acento-texto: #ffffff;   /* texto encima del acento */
+  --exito-texto: #006300;    /* montos positivos */
+
+  /* Colores de las gráficas */
+  --serie-ingresos: #2a78d6;
+  --serie-gastos: #eb6834;
+
+  /* Colores de estado del presupuesto (siempre van con icono y texto) */
+  --bien: #0ca30c;
+  --alerta: #fab219;
+  --critico: #d03b3b;
+}
+
+/* Modo oscuro: se activa solo si tu sistema está en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --fondo: #0d0d0d;
+    --superficie: #1a1a19;
+    --hover: #2c2c2a;
+    --tinta: #f0efec;
+    --tinta-2: #c3c2b7;
+    --tinta-3: #a3a29a;
+    --linea: #2c2c2a;
+    --base-grafica: #383835;
+    --acento: #5598e7;
+    --acento-texto: #0b0b0b;
+    --exito-texto: #2fc42f;
+    --serie-ingresos: #3987e5;
+    --serie-gastos: #d95926;
+  }
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+* { box-sizing: border-box; }
+
+/* Sin esto, un elemento con display: grid o flex ignora el atributo hidden */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+h1 { font-size: 1.5rem; margin: 0; }
+h2 { font-size: 1.05rem; margin: 0 0 4px; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+
+/* Contorno visible al navegar con teclado */
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* Solo los números que van en columnas usan cifras del mismo ancho */
+.num { font-variant-numeric: tabular-nums; }
+
+/* =========================================================
+   ESTRUCTURA GENERAL: menú + contenido
+   ========================================================= */
+.app {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.menu {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 20px 12px;
+  background: var(--superficie);
+  border-right: 1px solid var(--linea);
+}
+
+.marca { font-weight: 700; font-size: 1.15rem; padding: 0 12px 16px; }
+
+.menu-item {
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--tinta-2);
+  cursor: pointer;
+}
+.menu-item:hover { background: var(--hover); }
+.menu-item.activo { background: var(--hover); color: var(--tinta); font-weight: 600; }
+
+.principal {
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.barra-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+.selector-mes { display: flex; align-items: center; gap: 4px; }
+.selector-mes span { min-width: 165px; text-align: center; font-weight: 600; }
+
+/* =========================================================
+   BOTONES
+   ========================================================= */
+.boton {
+  padding: 9px 16px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--superficie);
+  cursor: pointer;
+}
+.boton:hover { background: var(--hover); }
+.boton-principal {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--acento-texto);
+  font-weight: 600;
+}
+.boton-principal:hover { background: var(--acento); filter: brightness(1.1); }
+.boton-peligro { color: var(--critico); }
+@media (prefers-color-scheme: dark) { .boton-peligro { color: #f08a8a; } }
+
+.boton-icono {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--superficie);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.boton-icono:hover { background: var(--hover); }
+
+.enlace {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--tinta-2);
+  font-size: .875rem;
+  cursor: pointer;
+}
+.enlace:hover { background: var(--hover); color: var(--tinta); }
+
+/* =========================================================
+   TARJETAS Y CIFRAS
+   ========================================================= */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.pila { display: grid; gap: 16px; }
+.cifras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.dos-columnas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+.etiqueta { color: var(--tinta-2); font-size: .9rem; }
+.ayuda { color: var(--tinta-3); font-size: .875rem; }
+.hero-valor { font-size: clamp(2rem, 6vw, 2.75rem); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.cifra-valor { font-size: 1.4rem; font-weight: 600; overflow-wrap: anywhere; }
+.positivo { color: var(--exito-texto); }
+
+.encabezado-seccion {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   GRÁFICAS
+   ========================================================= */
+.leyenda { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 8px 0; font-size: .875rem; color: var(--tinta-2); }
+.leyenda span { display: inline-flex; align-items: center; gap: 6px; }
+.leyenda i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.leyenda b { color: var(--tinta); font-weight: 600; }
+
+.grafica { width: 100%; }
+.grafica svg { display: block; width: 100%; }
+.grafica text { fill: var(--tinta-3); font-size: 12px; font-variant-numeric: tabular-nums; }
+.rejilla { stroke: var(--linea); stroke-width: 1; }
+.linea-base { stroke: var(--base-grafica); stroke-width: 1; }
+.barra-ingresos { fill: var(--serie-ingresos); }
+.barra-gastos { fill: var(--serie-gastos); }
+.banda { fill: transparent; cursor: default; outline: none; }
+.banda:hover, .banda:focus-visible { fill: var(--hover); opacity: .6; }
+
+/* Gráfica de barras horizontales: gastos por categoría */
+.barras-h { display: grid; gap: 10px; margin-top: 10px; }
+.fila-barra { display: grid; gap: 3px; border-radius: 6px; padding: 2px; }
+.fila-barra:hover { background: var(--hover); }
+.fila-barra-textos { display: flex; justify-content: space-between; gap: 12px; font-size: .9rem; }
+.fila-barra-pista { height: 14px; }
+.fila-barra-relleno { height: 100%; min-width: 3px; background: var(--serie-gastos); border-radius: 0 4px 4px 0; }
+
+details.tabla-detalle { margin-top: 12px; }
+details.tabla-detalle summary { cursor: pointer; color: var(--tinta-2); font-size: .875rem; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .9rem; }
+th, td { padding: 6px 4px; border-bottom: 1px solid var(--linea); text-align: left; }
+th { color: var(--tinta-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+#tooltip {
+  position: fixed;
+  z-index: 50;
+  max-width: 240px;
+  padding: 8px 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--superficie);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+  font-size: .85rem;
+  white-space: pre-line;
+  pointer-events: none;
+}
+
+/* =========================================================
+   LISTA DE MOVIMIENTOS
+   ========================================================= */
+.filtros { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-bottom: 8px; }
+
+.lista { list-style: none; margin: 0; padding: 0; }
+.mov {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--linea);
+}
+.mov:last-child { border-bottom: 0; }
+.mov-fecha { color: var(--tinta-3); font-size: .875rem; }
+.mov-titulo { font-weight: 500; overflow-wrap: anywhere; }
+.mov-detalle { color: var(--tinta-3); font-size: .85rem; overflow-wrap: anywhere; }
+.mov-monto { font-weight: 600; text-align: right; white-space: nowrap; }
+.mov-acciones { display: flex; }
+
+/* =========================================================
+   PRESUPUESTOS
+   ========================================================= */
+.presupuesto { padding: 14px 0; border-bottom: 1px solid var(--linea); }
+.presupuesto:last-child { border-bottom: 0; }
+.presupuesto-fila { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 4px 12px; }
+.medidor { height: 8px; margin: 8px 0 6px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--color-estado) 20%, var(--superficie)); }
+.medidor div { height: 100%; border-radius: 4px; background: var(--color-estado); }
+.estado-bien { --color-estado: var(--bien); }
+.estado-alerta { --color-estado: var(--alerta); }
+.estado-critico { --color-estado: var(--critico); }
+.estado-neutro { --color-estado: var(--acento); }
+
+/* Deudas */
+.deuda-nombre { overflow-wrap: anywhere; }
+.deuda-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 10px; }
+.segmentos.dos { grid-template-columns: repeat(2, 1fr); }
+.icono-corto { display: none; }
+.estado-texto { display: inline-flex; align-items: center; gap: 6px; font-size: .875rem; color: var(--tinta-2); }
+.estado-icono {
+  width: 18px; height: 18px;
+  display: inline-grid; place-items: center;
+  border-radius: 50%;
+  background: var(--color-estado);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 700;
+}
+.estado-alerta .estado-icono { color: #0b0b0b; }
+
+/* =========================================================
+   CUENTAS Y AJUSTES
+   ========================================================= */
+.fila-simple {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--linea);
+}
+.fila-simple:last-child { border-bottom: 0; }
+.fila-derecha { display: flex; align-items: center; gap: 8px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 3px 3px 12px;
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  font-size: .875rem;
+}
+.chip button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: none; color: var(--tinta-3); cursor: pointer; }
+.chip button:hover { background: var(--hover); color: var(--tinta); }
+
+.en-linea { display: flex; flex-wrap: wrap; gap: 8px; }
+.en-linea input { flex: 1 1 160px; }
+.botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+/* =========================================================
+   ESTADOS VACÍOS Y BANNER
+   ========================================================= */
+.vacio { padding: 28px 12px; text-align: center; color: var(--tinta-2); }
+.vacio .botones { justify-content: center; }
+
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+  background: var(--hover);
+}
+
+/* =========================================================
+   FORMULARIOS Y VENTANA EMERGENTE
+   ========================================================= */
+dialog {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 22px;
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+  background: var(--superficie);
+  color: var(--tinta);
+}
+dialog::backdrop { background: rgba(0, 0, 0, .45); }
+dialog h2 { font-size: 1.2rem; margin-bottom: 14px; }
+
+.campo { display: grid; gap: 4px; margin-bottom: 12px; font-size: .9rem; color: var(--tinta-2); }
+.campo small { color: var(--tinta-3); }
+
+input:not([type=radio]), select {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-size: 1rem;
+}
+
+/* Botones de Gasto / Ingreso / Transferencia */
+.segmentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 10px; background: var(--hover); border: 0; }
+.segmentos label { position: relative; text-align: center; padding: 7px 2px; border-radius: 7px; cursor: pointer; font-size: .875rem; }
+.segmentos input { position: absolute; opacity: 0; }
+.segmentos label:has(input:checked) { background: var(--superficie); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.segmentos label:has(input:focus-visible) { outline: 2px solid var(--acento); }
+
+.error { margin-bottom: 10px; color: var(--critico); font-size: .9rem; font-weight: 500; }
+.error:empty { display: none; }
+@media (prefers-color-scheme: dark) { .error { color: #f08a8a; } }
+
+.dialogo-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+
+#aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--tinta);
+  color: var(--superficie);
+  font-size: .9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+#aviso.visible { opacity: 1; }
+
+/* =========================================================
+   CELULAR Y PANTALLAS PEQUEÑAS
+   ========================================================= */
+@media (max-width: 860px) {
+  .dos-columnas { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .app { display: block; }
+
+  /* El menú pasa a ser una barra fija abajo */
+  .menu {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    height: auto;
+    flex-direction: row;
+    /* env(...) deja libre la zona de la rayita inferior de algunos celulares */
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+    border-right: 0;
+    border-top: 1px solid var(--linea);
+  }
+  .texto-largo { display: none; }
+  .icono-corto { display: inline; font-size: 1.15rem; line-height: 1; }
+
+  /* Botones más grandes, fáciles de tocar con el dedo */
+  .enlace { padding: 10px 12px; }
+  .boton-icono { width: 42px; height: 42px; }
+  .chip button { width: 34px; height: 34px; }
+  .marca { display: none; }
+  .menu-item { flex: 1 1 auto; min-width: 0; padding: 12px 3px; text-align: center; font-size: .7rem; }
+
+  /* Se deja espacio abajo para que el menú no tape el contenido */
+  .principal { padding: 16px 16px calc(84px + env(safe-area-inset-bottom)); }
+  .cifras { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filtros input { grid-column: 1 / -1; }
+
+  /* Primer renglón: título y Agregar. Segundo renglón: selector de mes */
+  .barra { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .barra-acciones { display: contents; }
+  .selector-mes { grid-row: 2; grid-column: 1 / -1; justify-content: space-between; }
+  #aviso { bottom: calc(76px + env(safe-area-inset-bottom)); }
+
+  /* Cada movimiento se acomoda en dos renglones */
+  .mov { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; }
+  .mov-fecha { grid-column: 1 / -1; }
+  .mov-acciones { grid-column: 1 / -1; justify-content: flex-end; }
+}
