@@ -1133,9 +1133,13 @@ navigator.storage?.persist?.();
 
 // Animación de entrada: un toque la salta, y al terminar se quita de la página
 const intro = document.getElementById('intro');
-intro.addEventListener('click', () => intro.remove());
+function quitarIntro() {
+  detenerSonidoIntro();
+  intro.remove();
+}
+intro.addEventListener('click', quitarIntro);
 intro.addEventListener('animationend', (evento) => {
-  if (evento.animationName === 'intro-salir') intro.remove();
+  if (evento.animationName === 'intro-salir') quitarIntro();
 });
 
 // ¡Arranca la app!
