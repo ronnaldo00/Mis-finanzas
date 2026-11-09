@@ -908,7 +908,7 @@ function exportar() {
   const archivo = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json' });
   const enlace = document.createElement('a');
   enlace.href = URL.createObjectURL(archivo);
-  enlace.download = `mis-finanzas-respaldo-${hoy()}.json`;
+  enlace.download = `mis-lukas-respaldo-${hoy()}.json`;
   enlace.click();
   URL.revokeObjectURL(enlace.href);
   avisar('Respaldo descargado');

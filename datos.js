@@ -3,7 +3,9 @@
 // Aquí no se dibuja nada en pantalla.
 // =========================================================
 
-// Nombre con el que se guardan los datos dentro del navegador
+// Nombre con el que se guardan los datos dentro del navegador.
+// OJO: conserva el nombre viejo de la app a propósito. Si se cambia,
+// la app deja de encontrar los datos que ya están guardados.
 const CLAVE_GUARDADO = 'mis-finanzas-v1';
 
 // Tipos de cuenta que se pueden escoger
@@ -129,7 +131,7 @@ function normalizarDatos(datos) {
 
   if (!datos || !Array.isArray(datos.cuentas) || !Array.isArray(datos.categorias)
       || !Array.isArray(datos.movimientos)) {
-    fallar('El archivo no es un respaldo de Mis Finanzas.');
+    fallar('El archivo no es un respaldo de Mis Lukas.');
   }
 
   const cuentas = datos.cuentas.map((c) => {

@@ -1,6 +1,6 @@
 {
-  "name": "Mis Finanzas",
-  "short_name": "Finanzas",
+  "name": "Mis Lukas",
+  "short_name": "Mis Lukas",
   "description": "Lleva tus cuentas, gastos, presupuestos y deudas.",
   "lang": "es-CO",
   "start_url": "./index.html",
