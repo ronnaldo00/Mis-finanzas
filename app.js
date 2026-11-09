@@ -1131,5 +1131,12 @@ if ('serviceWorker' in navigator
 // Le pide al navegador que no borre los datos si le falta espacio
 navigator.storage?.persist?.();
 
+// Animación de entrada: un toque la salta, y al terminar se quita de la página
+const intro = document.getElementById('intro');
+intro.addEventListener('click', () => intro.remove());
+intro.addEventListener('animationend', (evento) => {
+  if (evento.animationName === 'intro-salir') intro.remove();
+});
+
 // ¡Arranca la app!
 dibujar();

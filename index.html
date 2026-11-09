@@ -18,6 +18,68 @@
   <meta name="theme-color" content="#211d12" media="(prefers-color-scheme: dark)">
 </head>
 <body>
+  <!-- ANIMACIÓN DE ENTRADA: billetes cayendo en la billetera del logo.
+       Los tiempos y movimientos están en estilos.css (sección ANIMACIÓN DE ENTRADA).
+       El orden importa: lo que se escribe después queda encima, por eso los
+       billetes van entre la parte de atrás y el frente de la billetera. -->
+  <div id="intro" aria-hidden="true">
+    <svg viewBox="0 0 512 512" role="presentation">
+      <defs>
+        <!-- Un solo dibujo de billete que se reutiliza con <use> -->
+        <g id="billete">
+          <rect x="140" y="100" width="232" height="130" rx="8" fill="#d5e6cc"/>
+          <rect x="148" y="108" width="216" height="114" rx="4" fill="none" stroke="#1f4d2e" stroke-width="3"/>
+          <ellipse cx="256" cy="165" rx="36" ry="42" fill="#eef5e9" stroke="#1f4d2e" stroke-width="4"/>
+          <text x="256" y="181" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="700" fill="#1f4d2e">L</text>
+          <text x="172" y="136" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-weight="700" fill="#1f4d2e">100</text>
+          <text x="340" y="136" text-anchor="middle" font-family="Georgia, serif" font-size="17" font-weight="700" fill="#1f4d2e">100</text>
+        </g>
+      </defs>
+
+      <!-- Parte de atrás de la billetera -->
+      <g class="intro-billetera"><rect x="122" y="215" width="268" height="190" rx="44" fill="#991b1b"/></g>
+
+      <!-- Los dos últimos se quedan asomados, igual que en el logo -->
+      <g id="intro-primer-final" class="intro-billete-final" style="--giro-fin:-3deg;--fin-y:12px;--retraso:1.20s"><use href="#billete"/></g>
+      <g class="intro-billete-final" style="--giro-fin:-9deg;--fin-y:0px;--retraso:1.34s"><use href="#billete"/></g>
+
+      <!-- Frente de la billetera con su cara -->
+      <g class="intro-billetera">
+        <rect x="122" y="245" width="268" height="162" rx="44" fill="#ef4444"/>
+        <g class="intro-mejillas">
+          <circle cx="182" cy="338" r="14" fill="#f9a1a1"/>
+          <circle cx="330" cy="338" r="14" fill="#f9a1a1"/>
+        </g>
+        <g class="intro-ojos">
+          <ellipse cx="213" cy="302" rx="12" ry="16" fill="#1f2937"/>
+          <ellipse cx="299" cy="302" rx="12" ry="16" fill="#1f2937"/>
+          <circle cx="218" cy="295" r="4" fill="#ffffff"/>
+          <circle cx="304" cy="295" r="4" fill="#ffffff"/>
+        </g>
+        <!-- Boquita de asombro, que luego se cambia por la sonrisa -->
+        <ellipse class="intro-boca-o" cx="256" cy="350" rx="10" ry="12" fill="#1f2937"/>
+        <g class="intro-sonrisa">
+          <path d="M222 342H290Q284 366 256 366Q228 366 222 342Z" fill="#1f2937"/>
+          <path d="M240 359Q256 368 272 359" fill="none" stroke="#f472b6" stroke-width="6" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
+    <p class="intro-nombre">Mis Lukas</p>
+  </div>
+  <script>
+    // Lluvia de billetes: cada vez que se abre la app caen en posiciones distintas.
+    // Va aquí, junto al dibujo, para que los billetes existan desde el primer instante.
+    const CANTIDAD_BILLETES = 30;
+    const primerFinal = document.getElementById('intro-primer-final');
+    for (let i = 0; i < CANTIDAD_BILLETES; i++) {
+      const x = Math.round(Math.random() * 440 - 220);     // desde dónde cae
+      const giro = Math.round(Math.random() * 120 - 60);   // qué tan torcido viene
+      const retraso = (0.05 + i * 0.038).toFixed(2);       // uno detrás de otro
+      primerFinal.insertAdjacentHTML('beforebegin',
+        `<g class="intro-billete" style="--x:${x}px;--giro:${giro}deg;--retraso:${retraso}s"><use href="#billete"/></g>`);
+    }
+  </script>
+
   <div class="app">
     <!-- MENÚ: a la izquierda en computador, abajo en celular.
          El atributo data-vista dice qué pantalla abre cada botón (lo lee app.js). -->

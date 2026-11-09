@@ -419,6 +419,100 @@ input:not([type=radio]), select {
 #aviso.visible { opacity: 1; }
 
 /* =========================================================
+   ANIMACIÓN DE ENTRADA
+   Usa los colores fijos del logo, también en modo oscuro.
+   La salida también va aquí: si el JavaScript fallara,
+   la animación desaparece igual y no tapa la app.
+   ========================================================= */
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  background: #fde047;
+  overflow: hidden;
+  cursor: pointer;
+  animation: intro-salir .3s ease-in 2.6s forwards;
+}
+#intro svg { width: min(88vw, 400px); height: auto; overflow: visible; }
+.intro-nombre {
+  color: #1f2937;
+  font-size: 1.6rem;
+  font-weight: 700;
+  animation: intro-aparecer .35s ease-out 1.7s both;
+}
+
+/* Cada billete cae desde arriba y se mete en la billetera */
+.intro-billete {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intro-caer .75s cubic-bezier(.35, .1, .75, .8) var(--retraso) both;
+}
+.intro-billete-final {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: intro-caer-final .55s cubic-bezier(.3, 0, .3, 1) var(--retraso) both;
+}
+
+/* La billetera se aprieta con cada billete y al final da un salto.
+   El punto de apoyo es la base de la billetera. */
+.intro-billetera {
+  transform-origin: 256px 407px;
+  animation:
+    intro-tragar .24s ease-in-out .55s 6,
+    intro-saltar .55s ease-out 1.95s;
+}
+
+/* Primero boca de asombro; después, la sonrisa grande */
+.intro-boca-o { animation: intro-quitar .15s linear 1.3s forwards; }
+.intro-sonrisa {
+  transform-origin: 256px 342px;
+  animation: intro-sonreir .4s cubic-bezier(.3, 1.6, .5, 1) 1.3s both;
+}
+.intro-mejillas { animation: intro-aparecer .3s ease-out 1.35s both; }
+.intro-ojos {
+  transform-origin: 256px 302px;
+  animation: intro-parpadear .2s ease-in-out 2.3s;
+}
+
+@keyframes intro-caer {
+  from { transform: translate(var(--x), -130vh) rotate(var(--giro)); opacity: 1; }
+  /* Termina escondido detrás del frente de la billetera, por eso no necesita desvanecerse */
+  99%  { opacity: 1; }
+  to   { transform: translate(0, 185px) rotate(0deg) scale(.65); opacity: 0; }
+}
+@keyframes intro-caer-final {
+  from { transform: translateY(-130vh) rotate(12deg); }
+  to   { transform: translateY(var(--fin-y)) rotate(var(--giro-fin)); }
+}
+@keyframes intro-tragar {
+  50% { transform: scale(1.06, .93); }
+}
+@keyframes intro-saltar {
+  30% { transform: translateY(-46px) scale(.97, 1.04); }
+  65% { transform: translateY(0) scale(1.07, .92); }
+  85% { transform: translateY(-8px); }
+}
+@keyframes intro-sonreir {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+@keyframes intro-quitar { to { opacity: 0; } }
+@keyframes intro-aparecer {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes intro-parpadear { 50% { transform: scaleY(.1); } }
+@keyframes intro-salir { to { opacity: 0; visibility: hidden; } }
+
+/* Si el celular tiene las animaciones desactivadas, no se muestra */
+@media (prefers-reduced-motion: reduce) {
+  #intro { display: none; }
+}
+
+/* =========================================================
    CELULAR Y PANTALLAS PEQUEÑAS
    ========================================================= */
 @media (max-width: 860px) {
