@@ -88,6 +88,7 @@
 
     // SONIDO DE CONTADORA DE BILLETES. No usa archivo de audio: se fabrica con código.
     let audioIntro = null;
+    let resultadoSonidoIntro = 'todavía no se sabe'; // lo muestra Ajustes, para diagnosticar
 
     // Programa los "frrrrt": muchos golpecitos de ruido, muy cortos y seguidos,
     // uno por cada billete que pasa por la máquina, y el zumbido suave del motor.
@@ -143,12 +144,23 @@
 
     // Apaga el sonido cuando la animación termina o se salta
     function detenerSonidoIntro() {
+      if (audioIntro && resultadoSonidoIntro === 'esperando permiso') {
+        resultadoSonidoIntro = 'el navegador lo bloqueó';
+      }
       audioIntro?.close().catch(() => {});
       audioIntro = null;
     }
 
     function sonarIntro() {
-      if (!window.AudioContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (!window.AudioContext) {
+        resultadoSonidoIntro = 'este navegador no tiene audio';
+        return;
+      }
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        resultadoSonidoIntro = 'apagado: el celular tiene las animaciones desactivadas';
+        return;
+      }
+      resultadoSonidoIntro = 'esperando permiso';
       const comienzo = performance.now();
       const ENTRADA_BILLETES = 0.6; // segundos, cuando la billetera empieza a tragar
 
@@ -156,10 +168,11 @@
       // Si el navegador no permite sonido sin un toque previo, esto se queda
       // esperando y la animación sigue en silencio, sin ningún error.
       audioIntro.resume().then(() => {
+        // Si la animación ya se quitó, no hay nada que sonar
+        if (!audioIntro) return;
         const transcurrido = (performance.now() - comienzo) / 1000;
-        if (audioIntro && transcurrido < 1.2) {
-          programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido));
-        }
+        programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido));
+        resultadoSonidoIntro = `sonó (arrancó a los ${transcurrido.toFixed(1)} s)`;
       }).catch(() => {});
     }
     sonarIntro();

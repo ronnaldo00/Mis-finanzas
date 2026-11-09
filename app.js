@@ -530,6 +530,14 @@ function vistaAjustes() {
       </section>
 
       <section class="tarjeta">
+        <h2>Sonido de entrada</h2>
+        <p class="ayuda">Al abrir la app: ${esc(resultadoSonidoIntro)}</p>
+        <div class="botones">
+          <button class="boton" data-accion="probar-sonido">Probar sonido</button>
+        </div>
+      </section>
+
+      <section class="tarjeta">
         <h2>Respaldo de tus datos</h2>
         <p class="ayuda">Tus datos solo están en este navegador. Si borras el historial del navegador o cambias de dispositivo se pierden, así que descarga un respaldo de vez en cuando.</p>
         <div class="botones">
@@ -1035,6 +1043,15 @@ const ACCIONES = {
     estado.categorias = estado.categorias.filter((c) => c.id !== id);
     delete estado.presupuestos[id];
     guardarYDibujar('Categoría borrada');
+  },
+
+  // Aquí sí hay un toque en la pantalla, así que el navegador deja sonar
+  'probar-sonido': () => {
+    const contexto = new AudioContext();
+    contexto.resume().then(() => {
+      programarContadora(contexto, contexto.currentTime + 0.05);
+      setTimeout(() => contexto.close(), 2000);
+    });
   },
 
   exportar,
