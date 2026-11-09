@@ -99,7 +99,6 @@
 
     // SONIDO DE CONTADORA DE BILLETES. No usa archivo de audio: se fabrica con código.
     let audioIntro = null;
-    let resultadoSonidoIntro = 'todavía no se sabe'; // lo muestra Ajustes, para diagnosticar
 
     // Volumen general de la intro: 1 con sonido y 0 en silencio
     let volumenIntro = null;
@@ -188,23 +187,12 @@
 
     // Apaga el sonido cuando la animación termina o se salta
     function detenerSonidoIntro() {
-      if (audioIntro && resultadoSonidoIntro === 'esperando permiso') {
-        resultadoSonidoIntro = 'el navegador lo bloqueó';
-      }
       audioIntro?.close().catch(() => {});
       audioIntro = null;
     }
 
     function sonarIntro() {
-      if (!window.AudioContext) {
-        resultadoSonidoIntro = 'este navegador no tiene audio';
-        return;
-      }
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        resultadoSonidoIntro = 'apagado: el celular tiene las animaciones desactivadas';
-        return;
-      }
-      resultadoSonidoIntro = 'esperando permiso';
+      if (!window.AudioContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       const comienzo = performance.now();
       const ENTRADA_BILLETES = 0.6; // segundos, cuando la billetera empieza a tragar
 
@@ -224,7 +212,6 @@
         const retraso = Math.max(0, transcurrido - ENTRADA_BILLETES);
         const duracion = Math.max(0.5, 1.6 - retraso);
         programarContadora(audioIntro, audioIntro.currentTime + Math.max(0, ENTRADA_BILLETES - transcurrido), duracion, volumenIntro);
-        resultadoSonidoIntro = `sonó (arrancó a los ${transcurrido.toFixed(1)} s)`;
       }).catch(() => {});
     }
     sonarIntro();
