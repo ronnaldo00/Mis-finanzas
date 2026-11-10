@@ -16,11 +16,10 @@ const TITULOS = {
   deudas: 'Deudas',
   cuentas: 'Cuentas',
   ajustes: 'Ajustes',
-  asistente: 'Asistente',
 };
 
 // Estas pantallas no dependen de un mes, así que se oculta el selector
-const VISTAS_SIN_MES = ['deudas', 'cuentas', 'ajustes', 'asistente'];
+const VISTAS_SIN_MES = ['deudas', 'cuentas', 'ajustes'];
 
 const contenido = document.getElementById('contenido');
 const dialogo = document.getElementById('dialogo');
@@ -560,8 +559,6 @@ function dibujar() {
     deudas: vistaDeudas,
     cuentas: vistaCuentas,
     ajustes: vistaAjustes,
-    // Va dentro de una función porque asistente.js se carga después de este archivo
-    asistente: () => vistaAsistente(),
   };
 
   document.getElementById('titulo-vista').textContent = TITULOS[ui.vista];
@@ -583,7 +580,6 @@ function dibujar() {
 
   contenido.innerHTML = vistas[ui.vista]();
   dibujarGraficas();
-  if (ui.vista === 'asistente') dibujarChat(); // baja hasta el último mensaje
 }
 
 // ---------------------------------------------------------
