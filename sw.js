@@ -5,7 +5,7 @@
 // =========================================================
 
 // Si cambias la lista de archivos, sube este número (v2, v3...)
-const CACHE = 'mis-lukas-v4';
+const CACHE = 'mis-lukas-v5';
 
 const ARCHIVOS = [
   './',
@@ -14,6 +14,7 @@ const ARCHIVOS = [
   './datos.js',
   './graficas.js',
   './app.js',
+  './asistente.js',
   './manifest.webmanifest',
   './icono-180.png',
   './icono-192.png',

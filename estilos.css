@@ -571,6 +571,64 @@ input:not([type=radio]), select {
 }
 
 /* =========================================================
+   ASISTENTE (chat con Claude, ver asistente.js)
+   ========================================================= */
+.chat { display: flex; flex-direction: column; gap: 12px; }
+
+/* La lista de mensajes ocupa casi toda la pantalla y tiene su propio scroll */
+.chat-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: min(60vh, 560px);
+  overflow-y: auto;
+  padding: 4px 2px;
+}
+
+.chat-burbuja {
+  max-width: 85%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  overflow-wrap: anywhere;
+}
+/* Tus mensajes van a la derecha, en amarillo */
+.chat-yo { align-self: flex-end; background: var(--acento); color: var(--acento-texto); border-bottom-right-radius: 4px; }
+/* Los de Claude a la izquierda */
+.chat-ia { align-self: flex-start; background: var(--hover); border-bottom-left-radius: 4px; }
+/* Confirmación de lo que quedó anotado */
+.chat-nota { align-self: flex-start; font-size: .85rem; color: var(--exito-texto); border: 1px solid var(--linea); }
+.chat-error { align-self: flex-start; font-size: .9rem; color: var(--critico); border: 1px solid var(--linea); }
+@media (prefers-color-scheme: dark) { .chat-error { color: #f08a8a; } }
+
+/* Cada punto de una lista dentro de un mensaje */
+.chat-punto { display: block; padding-left: 14px; position: relative; margin-top: 3px; }
+.chat-punto::before { content: "•"; position: absolute; left: 2px; }
+
+/* Los tres puntitos que saltan mientras Claude responde */
+.chat-pensando { display: flex; gap: 5px; padding: 13px 15px; }
+.chat-pensando span { width: 7px; height: 7px; border-radius: 50%; background: var(--tinta-3); animation: chat-salto 1s infinite ease-in-out; }
+.chat-pensando span:nth-child(2) { animation-delay: .15s; }
+.chat-pensando span:nth-child(3) { animation-delay: .3s; }
+@keyframes chat-salto { 0%, 60%, 100% { transform: translateY(0); opacity: .5; } 30% { transform: translateY(-5px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .chat-pensando span { animation: none; } }
+
+.chat-escribir { display: flex; gap: 8px; align-items: flex-end; }
+.chat-escribir textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  background: var(--fondo);
+  color: var(--tinta);
+  font: inherit;
+  resize: none;
+}
+.chat-escribir button:disabled, .chat-escribir textarea:disabled { opacity: .6; cursor: wait; }
+.chat-opciones { display: flex; justify-content: space-between; gap: 8px; }
+
+
+/* =========================================================
    CELULAR Y PANTALLAS PEQUEÑAS
    ========================================================= */
 @media (max-width: 860px) {
@@ -607,6 +665,8 @@ input:not([type=radio]), select {
 
   /* Se deja espacio abajo para que el menú no tape el contenido */
   .principal { padding: 16px 16px calc(84px + env(safe-area-inset-bottom)); }
+  .chat-lista { height: calc(100dvh - 330px); min-height: 260px; }
+  .chat { padding: 14px; }
   .cifras { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filtros input { grid-column: 1 / -1; }
