@@ -447,58 +447,100 @@ function formatoChat(textoCrudo) {
     .replace(/(<\/span>)<br>/g, '$1');
 }
 
+// ---------------------------------------------------------
+// Estilo terminal de Linux: cada mensaje es una línea de la consola.
+// ---------------------------------------------------------
+
+// El "prompt", lo que sale antes de lo que escribes, como en la terminal
+const PROMPT = 'ronald@mis-lukas:~$';
+
+// Texto de bienvenida al abrir la terminal (o después de "clear")
+const BIENVENIDA = `
+  <div class="t-linea t-tenue">Mis Lukas · asistente con Claude (${MODELO})</div>
+  <div class="t-linea t-tenue">Cuéntame tus gastos, ingresos y deudas como se los contarías a un amigo.</div>
+  <div class="t-linea t-tenue">Escribe <span class="t-comando">ayuda</span> para ver ejemplos o <span class="t-comando">clear</span> para limpiar.</div>
+  <div class="t-linea">&nbsp;</div>`;
+
+// Lo que muestra el comando "ayuda" (no gasta saldo: no se le manda a Claude)
+const AYUDA = `Ejemplos de lo que puedes escribir:
+- hoy gasté 18 lukas en almuerzo, pagué con Nequi
+- me pagaron el sueldo, 2 palos a Lulo Bank
+- le debo 300 mil a mi primo Andrés, le pago el 15 de diciembre
+- abona 50 mil a la deuda de Andrés desde efectivo
+- ¿en qué se me fue la plata este mes?
+- ¿qué deuda me conviene pagar primero?
+Comandos: ayuda · clear (limpia la pantalla) · clave (cambia la clave de la API)`;
+
 function htmlBurbujas() {
-  const saludo = chat.burbujas.length > 0 ? '' : `
-    <div class="chat-burbuja chat-ia">
-      ¡Hola! Cuéntame tus gastos, ingresos y deudas como se los contarías a un amigo y yo los anoto. Por ejemplo:
-      <span class="chat-punto">"Hoy gasté 18 lukas en almuerzo, pagué con Nequi"</span>
-      <span class="chat-punto">"Le debo 300 mil a mi primo Andrés, le pago en diciembre"</span>
-      <span class="chat-punto">"¿En qué se me fue la plata este mes?"</span>
-    </div>`;
+  const lineas = chat.burbujas.map((b) => {
+    if (b.rol === 'yo') {
+      return `<div class="t-linea"><span class="t-prompt">${PROMPT}</span> ${formatoChat(b.texto)}</div>`;
+    }
+    if (b.rol === 'nota') {
+      return `<div class="t-linea t-ok">[  <span>OK</span>  ] Anotado: ${formatoChat(b.texto)}</div>`;
+    }
+    if (b.rol === 'error') {
+      return `<div class="t-linea t-error">[<span>ERROR</span>] ${formatoChat(b.texto)}</div>`;
+    }
+    // Respuesta de Claude (o del comando ayuda)
+    return `<div class="t-linea t-ia"><span class="t-claude">claude&gt;</span> ${formatoChat(b.texto)}</div>`;
+  }).join('');
 
-  const clases = { yo: 'chat-yo', ia: 'chat-ia', nota: 'chat-nota', error: 'chat-error' };
-  const burbujas = chat.burbujas.map((b) => `
-    <div class="chat-burbuja ${clases[b.rol]}">${b.rol === 'nota' ? '✓ Anotado: ' : ''}${formatoChat(b.texto)}</div>`).join('');
-
+  // Mientras Claude responde se ve un "cargando" con la rayita que gira
   const pensando = !chat.ocupado ? '' : `
-    <div class="chat-burbuja chat-ia chat-pensando" aria-label="Claude está escribiendo"><span></span><span></span><span></span></div>`;
+    <div class="t-linea t-tenue" aria-label="Claude está pensando"><span class="t-girando"></span> claude está pensando...</div>`;
 
-  return saludo + burbujas + pensando;
+  return BIENVENIDA + lineas + pensando;
+}
+
+// Barra de arriba con los tres botoncitos de colores, como una ventana de Linux
+function barraTerminal(titulo, conBotones) {
+  return `
+    <div class="t-barra">
+      <span class="t-puntos" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="t-titulo">${titulo}</span>
+      ${conBotones ? `
+        <span class="t-acciones">
+          <button type="button" data-accion="nueva-conversacion" title="Limpiar la pantalla">clear</button>
+          <button type="button" data-accion="cambiar-clave-ia" title="Cambiar la clave de la API">clave</button>
+        </span>` : ''}
+    </div>`;
 }
 
 function vistaAsistente() {
   if (!leerClaveIA()) {
     return `
-      <section class="tarjeta">
-        <h2>Conecta el asistente con Claude</h2>
-        <p class="ayuda" style="margin-bottom:12px">
-          El chat usa la API de Claude, que se paga aparte de tu plan de Claude (cuesta unos pocos pesos por mensaje).
-          Crea una clave en <strong>console.anthropic.com</strong> → API Keys, recarga saldo en Billing y pégala aquí.
-          La clave se queda solo en este dispositivo y no va en los respaldos.
-        </p>
-        <form data-form="clave-ia">
-          <label class="campo">Clave de la API
-            <input name="clave" type="password" autocomplete="off" placeholder="sk-ant-..." required>
-          </label>
-          <p class="error" role="alert"></p>
-          <button class="boton boton-principal" type="submit">Guardar clave</button>
-        </form>
+      <section class="terminal">
+        ${barraTerminal('ronald@mis-lukas: ~/configurar', false)}
+        <div class="t-pantalla t-pantalla-corta">
+          <div class="t-linea"><span class="t-prompt">${PROMPT}</span> mis-lukas --conectar-claude</div>
+          <div class="t-linea t-tenue">El asistente usa la API de Claude, que se paga aparte de tu plan de Claude (unos pocos pesos por mensaje).</div>
+          <div class="t-linea t-tenue">1. Entra a <span class="t-comando">console.anthropic.com</span> y crea una clave en API Keys.</div>
+          <div class="t-linea t-tenue">2. Recarga saldo en Billing.</div>
+          <div class="t-linea t-tenue">3. Pega la clave aquí abajo y presiona Enter.</div>
+          <div class="t-linea t-tenue">La clave se queda solo en este dispositivo y no va en los respaldos.</div>
+          <div class="t-linea">&nbsp;</div>
+          <form data-form="clave-ia" class="t-entrada">
+            <label for="clave-ia" class="t-prompt">clave:</label>
+            <input id="clave-ia" name="clave" type="password" autocomplete="off" placeholder="sk-ant-..." required>
+            <button type="submit" class="t-enter" aria-label="Guardar clave">⏎</button>
+            <p class="error t-error" role="alert"></p>
+          </form>
+        </div>
       </section>`;
   }
 
   return `
-    <section class="tarjeta chat">
-      <div class="chat-lista" id="chat-lista" aria-live="polite">${htmlBurbujas()}</div>
-      <form class="chat-escribir" data-form="chat">
-        <textarea name="mensaje" id="chat-mensaje" rows="2" maxlength="2000"
-          placeholder="Escribe aquí… (ej: pagué 50 mil de la luz con Lulo)" aria-label="Mensaje para el asistente"
+    <section class="terminal">
+      ${barraTerminal('ronald@mis-lukas: ~/asistente', true)}
+      <div class="t-pantalla" id="chat-lista" aria-live="polite">${htmlBurbujas()}</div>
+      <form class="t-entrada t-entrada-chat" data-form="chat">
+        <label for="chat-mensaje" class="t-prompt">${PROMPT}</label>
+        <textarea name="mensaje" id="chat-mensaje" rows="1" maxlength="2000"
+          placeholder="escribe aquí..." autocomplete="off" autocapitalize="off" spellcheck="false"
           ${chat.ocupado ? 'disabled' : ''}></textarea>
-        <button class="boton boton-principal" type="submit" ${chat.ocupado ? 'disabled' : ''}>Enviar</button>
+        <button type="submit" class="t-enter" aria-label="Enviar" ${chat.ocupado ? 'disabled' : ''}>⏎</button>
       </form>
-      <div class="chat-opciones">
-        <button class="enlace" data-accion="nueva-conversacion">Nueva conversación</button>
-        <button class="enlace" data-accion="cambiar-clave-ia">Cambiar clave</button>
-      </div>
     </section>`;
 }
 
@@ -510,10 +552,16 @@ function dibujarChat() {
   lista.scrollTop = lista.scrollHeight;
 
   const campo = document.getElementById('chat-mensaje');
-  const boton = document.querySelector('.chat-escribir button');
+  const boton = document.querySelector('.t-entrada-chat .t-enter');
   campo.disabled = chat.ocupado;
   boton.disabled = chat.ocupado;
   if (!chat.ocupado && matchMedia('(hover: hover)').matches) campo.focus();
+}
+
+// La cajita de texto crece hacia abajo a medida que escribes, hasta 6 renglones
+function ajustarAltoEntrada(campo) {
+  campo.style.height = 'auto';
+  campo.style.height = `${Math.min(campo.scrollHeight, 6 * 22)}px`;
 }
 
 // ---------------------------------------------------------
@@ -532,6 +580,24 @@ GUARDAR_FORMULARIO.chat = (form, datos) => {
   const mensaje = datos.get('mensaje').trim();
   if (!mensaje || chat.ocupado) return null;
   form.reset();
+  ajustarAltoEntrada(form.elements.mensaje);
+
+  // Comandos de la terminal: se resuelven aquí mismo, sin gastar saldo
+  const comando = mensaje.toLowerCase();
+  if (comando === 'clear' || comando === 'limpiar') {
+    ACCIONES['nueva-conversacion']();
+    return null;
+  }
+  if (comando === 'clave') {
+    ACCIONES['cambiar-clave-ia']();
+    return null;
+  }
+  if (comando === 'ayuda' || comando === 'help') {
+    chat.burbujas.push({ rol: 'yo', texto: mensaje }, { rol: 'ia', texto: AYUDA });
+    dibujarChat();
+    return null;
+  }
+
   conversar(mensaje);
   return null;
 };
@@ -549,10 +615,19 @@ ACCIONES['cambiar-clave-ia'] = () => {
   dibujar();
 };
 
-// En el computador, Enter envía y Shift+Enter hace un salto de línea
+// Como en la terminal, Enter envía. Shift+Enter hace un salto de línea.
 document.addEventListener('keydown', (evento) => {
   if (evento.target.id !== 'chat-mensaje' || evento.key !== 'Enter' || evento.shiftKey) return;
-  if (!matchMedia('(hover: hover)').matches) return; // en el celular Enter sigue siendo salto de línea
   evento.preventDefault();
   evento.target.form.requestSubmit();
+});
+
+document.addEventListener('input', (evento) => {
+  if (evento.target.id === 'chat-mensaje') ajustarAltoEntrada(evento.target);
+});
+
+// Tocar cualquier parte de la terminal pone el cursor para escribir
+document.addEventListener('click', (evento) => {
+  if (!evento.target.closest('#chat-lista') || getSelection().toString()) return;
+  document.getElementById('chat-mensaje')?.focus();
 });
